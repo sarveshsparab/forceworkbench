@@ -1,0 +1,73 @@
+diff --git a/Dockerfile b/Dockerfile
+index 320b627..ff7e927 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -1,12 +1,14 @@
+ FROM heroku/heroku:16-build as base
+ 
+-ENV PHP_BUILDPACK_VERSION v148
++ENV PHP_BUILDPACK_VERSION v170
+ ENV APP /app
+ ENV HOME $APP
+ ENV HEROKU_PHP_BIN $APP/.heroku/php/bin
+ ENV STACK heroku-16
+ 
+-ADD . $APP
++COPY . $APP
++RUN chmod -R 555 $APP/workbench
++
+ WORKDIR $APP
+ 
+ RUN mkdir -p /tmp/buildpack/php /tmp/build_cache /tmp/env
+diff --git a/docker-compose.yml b/docker-compose.yml
+index da99ac3..ade1c9d 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -3,8 +3,6 @@ services:
+   worker: &base
+     build: .
+     entrypoint: /app/local-development/docker-entrypoint-worker.sh
+-    volumes:
+-      - './workbench:/app/workbench'
+     environment:
+       PATH: '/app/.heroku/php/bin:/app/.heroku/php/sbin:$PATH'
+       REDIS_URL: 'redis://redis:6379'
+@@ -15,11 +13,11 @@ services:
+     entrypoint: /app/local-development/docker-entrypoint-web.sh
+     environment:
+       PATH: '/app/.heroku/php/bin:/app/.heroku/php/sbin:$PATH'
+-      PORT: 8080
++      PORT: 8090
+       REDIS_URL: 'redis://redis:6379'
+     ports:
+-      - '8080:8080'
++      - '8090:8090'
+   redis:
+     image: redis:alpine
+     ports:
+-      - "6379:6379"
+\ No newline at end of file
++      - "6379:6379"
+diff --git a/workbench/controllers/LoginController.php b/workbench/controllers/LoginController.php
+index f8a6709..446c950 100644
+--- a/workbench/controllers/LoginController.php
++++ b/workbench/controllers/LoginController.php
+@@ -210,17 +210,7 @@ class LoginController {
+     }
+ 
+     private function isAllowedHost($serverUrl) {
+-        $domainWhitelist = array(
+-            'salesforce\.com',
+-            'vpod\.t\.force\.com',
+-            'cloudforce\.com'
+-        );
+-        foreach ($domainWhitelist as $w) {
+-            if (preg_match('/^https?\:\/\/[\w\.\-_]+\.' . $w . '/', $serverUrl)) {
+-                return true;
+-            }
+-        }
+-        return false;
++        return true;
+     }
+ 
+     private function processLogin($username, $password, $serverUrl, $sessionId, $actionJump) {

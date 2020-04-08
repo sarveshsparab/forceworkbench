@@ -210,17 +210,7 @@ class LoginController {
     }
 
     private function isAllowedHost($serverUrl) {
-        $domainWhitelist = array(
-            'salesforce\.com',
-            'vpod\.t\.force\.com',
-            'cloudforce\.com'
-        );
-        foreach ($domainWhitelist as $w) {
-            if (preg_match('/^https?\:\/\/[\w\.\-_]+\.' . $w . '/', $serverUrl)) {
-                return true;
-            }
-        }
-        return false;
+        return true;
     }
 
     private function processLogin($username, $password, $serverUrl, $sessionId, $actionJump) {

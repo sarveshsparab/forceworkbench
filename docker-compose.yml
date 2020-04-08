@@ -3,8 +3,6 @@ services:
   worker: &base
     build: .
     entrypoint: /app/local-development/docker-entrypoint-worker.sh
-    volumes:
-      - './workbench:/app/workbench'
     environment:
       PATH: '/app/.heroku/php/bin:/app/.heroku/php/sbin:$PATH'
       REDIS_URL: 'redis://redis:6379'
@@ -15,10 +13,10 @@ services:
     entrypoint: /app/local-development/docker-entrypoint-web.sh
     environment:
       PATH: '/app/.heroku/php/bin:/app/.heroku/php/sbin:$PATH'
-      PORT: 8080
+      PORT: 8090
       REDIS_URL: 'redis://redis:6379'
     ports:
-      - '8080:8080'
+      - '8090:8090'
   redis:
     image: redis:alpine
     ports:
